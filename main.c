@@ -1,17 +1,25 @@
 #include <stdio.h>
-#include "primitive.h"
-#include "readImage.h"
-#include "saveImages.h"
+#include <string.h>
+#include "./pointsH/primitive.h"
+#include "./pointsH/readImage.h"
+#include "./pointsH/saveImages.h"
+#include "./pointsH/filters.h"
 
 int main() {
   Image img;
-  buildImage(&img);
-  //Salvar a imagem normalmente, ou seja, lê e salva em outro arquivo.
-  saveImageNormal(&img);
-  //Aplica o algoritmo para deixar toda imagem cinza.
-  saveImageColorToGray(&img);
+  char nameFileImage[20];
+  fgets(nameFileImage, 20, stdin);
 
-//Fecha o arquivo.	
+  //Contruindo imagem.
+  //Recebe como parâmetro a variável Image e o nome do arquivo da imagem a ser diagnósticada.
+  buildImage(&img, nameFileImage);
+
+  //Chamando filtro cinza.
+  grayFilter(&img);
+
+  // //Salvando imagem
+  saveImage(&img);
+
   fclose(img.file);
   return 0;
 }

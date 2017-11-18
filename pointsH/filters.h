@@ -1,0 +1,1 @@
+void grayFilter(Image *img);
