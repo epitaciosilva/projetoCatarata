@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../pointsH/primitive.h"
-#include "../pointsH/readImage.h"
+#include "../pointsH/imageTreatment.h"
 
 //Apenas chamo as funções para construção da imagem.
 void buildImage(Image *img, char *nameFileImage) {
@@ -83,4 +83,21 @@ void verifyFileImage(Image *img) {
     printf("Formato da imagem deve ser P3.\n");
     exit(1);
   }
+}
+
+Pixel * pixelReturn(Image *img, int line, int column) {
+  if(line >= img->height) {
+    line = img->height-1;
+  }
+  if(column >= img->width) {
+    column = img->width-1;
+  }
+  if(line < 0) {
+    line = 0;
+  }
+  if(column < 0) {
+    column = 0;
+  }
+  
+  return &img->pixels[line][column];
 }

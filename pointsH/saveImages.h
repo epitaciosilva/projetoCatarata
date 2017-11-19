@@ -1,1 +1,1 @@
-void saveImage(Image *img);
+void saveImage(Image *img, char *nameFileImage);

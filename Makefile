@@ -1,2 +1,2 @@
 all:
-	gcc main.c ./pointsC/readImage.c ./pointsC/filters.c ./pointsC/saveImages.c -o exec
+	gcc main.c ./pointsC/imageTreatment.c ./pointsC/filters.c ./pointsC/saveImages.c -o exec

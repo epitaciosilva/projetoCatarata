@@ -4,11 +4,14 @@
 #include "../pointsH/primitive.h"
 #include "../pointsH/saveImages.h"
 
-void saveImage(Image *img) {
+void saveImage(Image *img, char *nameFileImage) {
     int i, j;
-    FILE *imageFile = fopen("images/finalImage.ppm", "w+");
+    char dest[100] = "images/";
+    strncat(dest, nameFileImage, strlen(nameFileImage));
+    FILE *imageFile = fopen(dest, "w+");
 
-    //Essas próximas três formam o cabeçalho da image. Tipo, dimensões e o valor máximo de um pixel
+    //Essas próximas três linhas formam o cabeçalho da imagem.
+    //Tipo, dimensões e o valor máximo de um pixel respectivamente.
     fprintf(imageFile, "P3\n");
     fprintf(imageFile, "%d %d\n", img->width, img->height);
     fprintf(imageFile, "%d\n", img->maxPixel);
