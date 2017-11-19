@@ -6,10 +6,11 @@
 
 //Apenas chamo as funções para construção da imagem.
 void buildImage(Image *img, char *nameFileImage) {
-  int i, j;
-  char dest[50] = "images/";
-  strncat(dest, nameFileImage, strlen(nameFileImage)-1);
-  img->file = fopen(dest, "rw");
+  if(nameFileImage != '\0') {
+    char dest[50] = "images/";
+    strncat(dest, nameFileImage, strlen(nameFileImage)-1);
+    img->file = fopen(dest, "rw");
+  }
 
   //Primeiro verifico o arquivo, se foi possível ler ou não e o tipo da imagem.
   verifyFileImage(img);
@@ -21,24 +22,23 @@ void buildImage(Image *img, char *nameFileImage) {
   buildPixelsMatrix(img);
 }
 
-void buildPixelsMatrix(Image *img) {
-  int i, j;
-  //Contruindo a matriz de pixels da imagem
-  img->pixels = malloc(img->height * sizeof(Pixel*));
-
-  for(i = 0;  i < img->height; i++) {
-    img->pixels[i] = malloc(img->width * sizeof(Pixel));
+void verifyFileImage(Image *img) {
+  //Verificando se foi possível ler o arquivo.
+  if(img->file == NULL) {
+    printf("Nao foi possivel abrir o arquivo.\n");
+    exit(1);
   }
 
-  //Lê todos os valores do arquivo e e preenche toda a matriz de pixel
-  for(i = 0; i < img->height; i++) {
-    for(j = 0; j < img->width; j++) {
-      fscanf(img->file, "%d", &img->pixels[i][j].r);
-      fscanf(img->file, "%d", &img->pixels[i][j].g);
-      fscanf(img->file, "%d", &img->pixels[i][j].b);
-    }
+  //Pegando a primeira linha do arquivo, no caso é o cabeçalho.
+  char header[3];
+  fscanf(img->file, "%s ", header);
+  //Verifica se é do tipo P3
+  if(header[0] != 'P' || header[1] != '3') {
+    printf("Formato da imagem deve ser P3.\n");
+    exit(1);
   }
 }
+
 
 void deleteComments(FILE *fileImage) {
   //fgetc retira o primeiro char do arquivo.
@@ -68,20 +68,22 @@ void allocateDimensions(Image *img) {
   fscanf(img->file, "%d", &img->maxPixel);
 }
 
-void verifyFileImage(Image *img) {
-  //Verificando se foi possível ler o arquivo.
-  if(img->file == NULL) {
-    printf("Nao foi possivel abrir o arquivo.\n");
-    exit(1);
+void buildPixelsMatrix(Image *img) {
+  int i, j;
+  //Contruindo a matriz de pixels da imagem
+  img->pixels = malloc(img->height * sizeof(Pixel*));
+
+  for(i = 0;  i < img->height; i++) {
+    img->pixels[i] = malloc(img->width * sizeof(Pixel));
   }
 
-  //Pegando a primeira linha do arquivo, no caso é o cabeçalho.
-  char header[3];
-  fscanf(img->file, "%s ", header);
-  //Verifica se é do tipo P3
-  if(header[0] != 'P' || header[1] != '3') {
-    printf("Formato da imagem deve ser P3.\n");
-    exit(1);
+  //Lê todos os valores do arquivo e e preenche toda a matriz de pixel
+  for(i = 0; i < img->height; i++) {
+    for(j = 0; j < img->width; j++) {
+      fscanf(img->file, "%d", &img->pixels[i][j].r);
+      fscanf(img->file, "%d", &img->pixels[i][j].g);
+      fscanf(img->file, "%d", &img->pixels[i][j].b);
+    }
   }
 }
 
@@ -98,6 +100,6 @@ Pixel * pixelReturn(Image *img, int line, int column) {
   if(column < 0) {
     column = 0;
   }
-  
+
   return &img->pixels[line][column];
 }

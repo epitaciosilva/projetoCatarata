@@ -1,3 +1,2 @@
 exec
-images/gaussianoImage.ppm
-images/grayImage.ppm
+images/*Image.ppm

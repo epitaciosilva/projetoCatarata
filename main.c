@@ -6,7 +6,7 @@
 #include "./pointsH/filters.h"
 
 int main() {
-  Image img;
+  Image img, image;
   char nameFileImage[20];
   char nameFinalFileImage[20];
   fgets(nameFileImage, 20, stdin);
@@ -14,6 +14,7 @@ int main() {
   //Contruindo imagem.
   //Recebe como parâmetro a variável Image e o nome do arquivo da imagem a ser diagnósticada.
   buildImage(&img, nameFileImage);
+  buildImage(&image, nameFileImage);
 
   //Filtro cinza.
   grayFilter(&img);
@@ -25,6 +26,11 @@ int main() {
   strcpy(nameFinalFileImage, "gaussianoImage.ppm");
   saveImage(&img, nameFinalFileImage);
 
+  sobelFilter(&img, &image);
+  strcpy(nameFinalFileImage, "sobelImage.ppm");
+  saveImage(&image, nameFinalFileImage);
+
   fclose(img.file);
+  fclose(image.file);
   return 0;
 }
