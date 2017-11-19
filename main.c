@@ -5,10 +5,18 @@
 #include "./pointsH/saveImages.h"
 #include "./pointsH/filters.h"
 
+void concatenateFileName(char nameFile[15], char *nameFinalFileImage, char nameFileImage[20]) {
+  strcpy(nameFinalFileImage, "");
+
+  strncat(nameFinalFileImage, nameFileImage, strlen(nameFileImage)-5);
+  strncat(nameFinalFileImage, nameFile, strlen(nameFile));
+  strncat(nameFinalFileImage, ".ppm", 4);
+}
+
 int main() {
   Image img, image;
   char nameFileImage[20];
-  char nameFinalFileImage[20];
+  char nameFinalFileImage[50];
   fgets(nameFileImage, 20, stdin);
 
   //Contruindo imagem.
@@ -18,16 +26,20 @@ int main() {
 
   //Filtro cinza.
   grayFilter(&img);
-  strcpy(nameFinalFileImage, "grayImage.ppm");
+  concatenateFileName("GrayImage", nameFinalFileImage, nameFileImage);
   saveImage(&img, nameFinalFileImage);
 
   //Filtro gaussiano
   gaussianoFilter(&img);
-  strcpy(nameFinalFileImage, "gaussianoImage.ppm");
+  concatenateFileName("GaussianoImage", nameFinalFileImage, nameFileImage);
   saveImage(&img, nameFinalFileImage);
 
   sobelFilter(&img, &image);
-  strcpy(nameFinalFileImage, "sobelImage.ppm");
+  concatenateFileName("SobelImage", nameFinalFileImage, nameFileImage);
+  saveImage(&image, nameFinalFileImage);
+
+  binaryFilter(&image);
+  concatenateFileName("BinaryImage", nameFinalFileImage, nameFileImage);
   saveImage(&image, nameFinalFileImage);
 
   fclose(img.file);

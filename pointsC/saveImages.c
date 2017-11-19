@@ -14,7 +14,7 @@ void saveImage(Image *img, char *nameFileImage) {
     //Tipo, dimensões e o valor máximo de um pixel respectivamente.
     fprintf(imageFile, "P3\n");
     fprintf(imageFile, "%d %d\n", img->width, img->height);
-    fprintf(imageFile, "%d\n", img->maxPixel);
+    fprintf(imageFile, "%d\n", 255);
 
     for(i = 0; i<img->height; i++) {
       for(j = 0; j<img->width; j++) {

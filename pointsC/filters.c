@@ -58,7 +58,7 @@ void sobelFilter(Image *img, Image *image) {
   int x, y, m, n, newPixel = 0;
   int valueX, valueY;
   Pixel *pixel;
-
+  img->maxPixel = 0;
   int sobelX[3][3] = {{-1, 0, 1},
                       {-2, 0, 2},
                       {-1, 0, 1}};
@@ -84,23 +84,25 @@ void sobelFilter(Image *img, Image *image) {
       image->pixels[x][y].r = newPixel;
       image->pixels[x][y].g = newPixel;
       image->pixels[x][y].b = newPixel;
+      image->maxPixel += newPixel;
     }
   }
 }
 
-// void binary(Image *img) {
-//   int i, j;
-//   for (i = 0; i < img->height; i++) {
-//     for (j = 0; j < img->width; j++) {
-//       if(img->pixels[i][j].r > 28) {
-//         img->pixels[i][j].r = 255;
-//         img->pixels[i][j].g = 255;
-//         img->pixels[i][j].b = 255;
-//       }else {
-//         img->pixels[i][j].r = 0;
-//         img->pixels[i][j].g = 0;
-//         img->pixels[i][j].b = 0;
-//       }
-//     }
-//   }
-// }
+void binaryFilter(Image *img) {
+  int i, j;
+  int averageSumPixels= img->maxPixel/(img->width*img->height);
+  for (i = 0; i < img->height; i++) {
+    for (j = 0; j < img->width; j++) {
+      if(img->pixels[i][j].r > averageSumPixels) {
+        img->pixels[i][j].r = 255;
+        img->pixels[i][j].g = 255;
+        img->pixels[i][j].b = 255;
+      }else {
+        img->pixels[i][j].r = 0;
+        img->pixels[i][j].g = 0;
+        img->pixels[i][j].b = 0;
+      }
+    }
+  }
+}
