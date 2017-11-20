@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include "./pointsH/primitive.h"
-#include "./pointsH/imageTreatment.h"
-#include "./pointsH/saveImages.h"
-#include "./pointsH/filters.h"
+#include "./include/primitive.h"
+#include "./include/imageTreatment.h"
+#include "./include/saveImages.h"
+#include "./include/filters.h"
 
 void concatenateFileName(char nameFile[15], char *nameFinalFileImage, char nameFileImage[20]) {
   strcpy(nameFinalFileImage, "");

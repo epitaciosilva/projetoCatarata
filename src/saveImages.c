@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../pointsH/primitive.h"
-#include "../pointsH/saveImages.h"
+#include "../include/primitive.h"
+#include "../include/saveImages.h"
 
 void saveImage(Image *img, char *nameFileImage) {
     int i, j;
@@ -14,7 +14,7 @@ void saveImage(Image *img, char *nameFileImage) {
     //Tipo, dimensões e o valor máximo de um pixel respectivamente.
     fprintf(imageFile, "P3\n");
     fprintf(imageFile, "%d %d\n", img->width, img->height);
-    fprintf(imageFile, "%d\n", 255);
+    fprintf(imageFile, "%d\n", img->maxPixel);
 
     for(i = 0; i<img->height; i++) {
       for(j = 0; j<img->width; j++) {

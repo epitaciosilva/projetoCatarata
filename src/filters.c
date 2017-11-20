@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "../pointsH/primitive.h"
-#include "../pointsH/filters.h"
-#include "../pointsH/imageTreatment.h"
+#include "../include/primitive.h"
+#include "../include/filters.h"
+#include "../include/imageTreatment.h"
 
 void grayFilter(Image *img) {
     int i, j;
@@ -58,7 +58,6 @@ void sobelFilter(Image *img, Image *image) {
   int x, y, m, n, newPixel = 0;
   int valueX, valueY;
   Pixel *pixel;
-  img->maxPixel = 0;
   int sobelX[3][3] = {{-1, 0, 1},
                       {-2, 0, 2},
                       {-1, 0, 1}};
@@ -84,17 +83,16 @@ void sobelFilter(Image *img, Image *image) {
       image->pixels[x][y].r = newPixel;
       image->pixels[x][y].g = newPixel;
       image->pixels[x][y].b = newPixel;
-      image->maxPixel += newPixel;
     }
   }
 }
 
 void binaryFilter(Image *img) {
   int i, j;
-  int averageSumPixels= img->maxPixel/(img->width*img->height);
+  int threshold = 18;
   for (i = 0; i < img->height; i++) {
     for (j = 0; j < img->width; j++) {
-      if(img->pixels[i][j].r > averageSumPixels) {
+      if(img->pixels[i][j].r > threshold) {
         img->pixels[i][j].r = 255;
         img->pixels[i][j].g = 255;
         img->pixels[i][j].b = 255;

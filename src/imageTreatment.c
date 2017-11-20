@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../pointsH/primitive.h"
-#include "../pointsH/imageTreatment.h"
+#include "../include/primitive.h"
+#include "../include/imageTreatment.h"
 
 //Apenas chamo as funções para construção da imagem.
 void buildImage(Image *img, char *nameFileImage) {
