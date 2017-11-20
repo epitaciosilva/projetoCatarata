@@ -17,6 +17,8 @@ int main() {
   Image img, image;
   char nameFileImage[20];
   char nameFinalFileImage[50];
+
+  printf("Insira o nome do arquivo:\n");
   fgets(nameFileImage, 20, stdin);
 
   //Contruindo imagem.
@@ -44,5 +46,7 @@ int main() {
 
   fclose(img.file);
   fclose(image.file);
+
+  houghTransform(&img);
   return 0;
 }

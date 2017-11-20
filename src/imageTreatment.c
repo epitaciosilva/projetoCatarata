@@ -103,3 +103,20 @@ Pixel * pixelReturn(Image *img, int line, int column) {
 
   return &img->pixels[line][column];
 }
+
+int ***matrixGenerate() {
+  int i, j; //[200][300][100]
+  int ***matrix = calloc(200, sizeof(int**));
+
+  for(i = 0; i < 200; i++) {
+      matrix[i] = calloc(300, sizeof(int*));
+    for(j = 0; j < 300; j++) {
+      matrix[i][j] = calloc(100, sizeof(int));
+    }
+  }
+  return matrix;
+}
+
+void houghTransform(Image *img) {
+  int ***matrix = matrixGenerate();
+}
