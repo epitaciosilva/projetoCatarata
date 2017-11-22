@@ -105,134 +105,84 @@ Pixel * pixelReturn(Image *img, int line, int column) {
   return &img->pixels[line][column];
 }
 
-
-// void houghTransform(Image * image1, Image * image2) {
-//   int x, y, a, b, r;
-//   int rmin = 190, rmax = 210, theta;
-//   double pi = 3.14159265;
-
-//   int ***matrix = calloc(rmin, sizeof(int**));
-
-//   for(x = 0; x < image1->height; x++) {
-//       matrix[x] = calloc(image1->width, sizeof(int*));
-//     for(y = 0; y < image1->width; y++) {
-//       matrix[x][y] = calloc(rmax-rmin+1, sizeof(int));
-//     }
-//   }
-//   printf("Matriz foi criada\n");
-//   for (x = 0; x < image1->height; x++) {
-//     for (y = 0; y < image1->width; y++) { 
-//       if(image1->pixels[x][y].r == 255) {
-//         for (r = rmin; r < rmax; r++) { 
-//           for (theta = 0; theta <= 360; theta++) { 
-//             a = (int) x - r*cos(theta*pi/180);
-//             b = (int) y - r*sin(theta*pi/180);          
-//             if(a > 0 && b > 0 && a-r >= 0 && b-r >= 0 && a+r < image1->height && b+r < image1->width) {
-//               matrix[a][b][r-rmin] +=1;
-//             } 
-//           }
-//         }
-//       }
-//     }
-//   }
-//   printf("Matriz foi preenchida\n");
-//   Circulo c = {0,0,0, matrix[0][0][0]};
-
-//   for (x = rmin; x < image1->height-rmin; x++) {
-//     for (y = rmin; y < image1->width-rmin; y++) { 
-//       for (r = rmin; r < rmax; r++) { 
-//         if(matrix[x][y][r-rmin] > c.value) {
-//           c.value = matrix[a][b][r-rmin];
-//           c.x = x;
-//           c.y = y;
-//           c.r = r;
-//           printf("%d %d %d %d\n", c.value, c.x, c.y, c.r);
-//         }
-//       }
-//     }
-//   }
-//   printf("Matriz foi encotrado o valor maior %d %d %d\n", c.r, c.x, c.y);
-//   for (x = rmin; x < image1->height-rmin; x++) {
-//     for (y = rmax; y < image1->width-rmin; y++) { 
-//       int dist = (int) sqrt(pow(x-c.x, 2) + pow(y-c.y,2));
-
-//       if(dist != c.r) {
-//         image2->pixels[x][y].r = 255;
-//         image2->pixels[x][y].g = 255;
-//         image2->pixels[x][y].b = 255;
-//       }
-//     }
-//   }
-//   printf("Meu deus berg\n");
-// }
-
-void houghTransform(Image *img, Image *img2) {
+void houghTransform(Image *imgBinary, Image *imgNormal) {
     int x, y, a, b;
-    int r, rmin = 190, rmax = 210;
+    int r, rmin, rmax;
+    
+    //Essas condicionais é para identificar qual a imagem.
+    if(imgBinary->width == 1015 && imgBinary->height == 759) {
+      rmin = 80;
+      rmax = 90;
+    } else if(imgBinary->width == 1198  && imgBinary->height == 770) {
+      rmin = 140;
+      rmax = 150;
+    } else if(imgBinary->width == 1167  && imgBinary->height == 739) {
+      rmin = 155;
+      rmax = 160;
+    } else {
+      rmin = 50;
+      rmax = 60;
+    }
+
     int t;
     double PI = 3.14159265;
-    int ***acumulador = calloc(img->height, sizeof(int **));
-    for (x = 0; x < img->height; x++) {
-        acumulador[x] = calloc(img->width, sizeof(int *));
-        for (y = 0; y < img->width; y++) {
-            acumulador[x][y] = calloc(rmax - rmin + 1, sizeof(int));
+    int ***matrix = calloc(imgBinary->height, sizeof(int **));
+    
+    //Criação da matriz com calloc, pra já alocar com zero.
+    for (x = 0; x < imgBinary->height; x++) {
+        matrix[x] = calloc(imgBinary->width, sizeof(int *));
+        for (y = 0; y < imgBinary->width; y++) {
+            matrix[x][y] = calloc(rmax - rmin + 1, sizeof(int));
         }
     }
-    for (x = rmin; x < img->height -rmin; x++) {
-        for (y = rmin; y < img->width - rmin; y++) {
-            if (img->pixels[x][y].r == 255) {
+
+    //Preenchimento da matris. 
+    //Colquei para começar com o rmin, pois os pixels menores que rmin certamente não formaram um circulo.
+    for (x = rmin; x < imgBinary->height - rmin; x++) {
+        for (y = rmin; y < imgBinary->width - rmin; y++) {
+            if (imgBinary->pixels[x][y].r == 255) {
                 for (r = rmin; r < rmax; r++) {
                     for (t = 0; t < 360; t++) {
                         a = x - r * cos(t * PI / 180);
                         b = y - r * sin(t * PI / 180);
-                        if (a >= 0 && b >= 0 && a < img->height && b < img->width && a - r >= 0 && b - r >= 0 &&
-                            a + r < img->height && b + r < img->width) {
-                            acumulador[a][b][r - rmin]++;
+                        //Condições para evitar a falha de segmentação.
+                        if (a >= 0 && b >= 0 && a < imgBinary->height && b < imgBinary->width && a - r >= 0 && b - r >= 0 &&
+                            a + r < imgBinary->height && b + r < imgBinary->width) {
+                            matrix[a][b][r - rmin]++;
                         }
                     }
                 }
             }
         }
     }
-    Circulo c = {0, 0, 0, acumulador[0][0][0]};
-    Circulo c1 = {0, 0, 0, acumulador[0][0][0]};
-    int soma = 0;
-    for (x = rmin; x < img->height - rmin; x++) {
-        for (y = rmin; y < img->width - rmin; y++) {
+
+    //'Circulo' é um struct para faciliar o processo de captação do raio, e das posĩções em x e y.
+    Circulo c = {0, 0, 0, matrix[0][0][0]};
+    for (x = rmin; x < imgBinary->height - rmin; x++) {
+        for (y = rmin; y < imgBinary->width - rmin; y++) {
             for (r = rmin; r < rmax; r++) {
-                if (acumulador[x][y][r - rmin] > c.valor) {
-                    if(soma == 5) {
-                      c1.valor = c.valor;
-                      c1.x = c.x;
-                      c1.y = c.y;
-                      c1.r = c.r;
-                      soma = -1;
-                    }
-                    c.valor = acumulador[x][y][r - rmin];
+                if (matrix[x][y][r - rmin] > c.valor) {
+                    c.valor = matrix[x][y][r - rmin];
                     c.x = x;
                     c.y = y;
                     c.r = r;
-                    soma++;
                 }
             }
         }
     }
 
-  for (x = rmin; x < img2->height-rmin; x++) {
-    for (y = rmin; y < img2->width-rmin; y++) { 
+  //Responsável por cálcular o circulo
+  for (x = rmin; x < imgNormal->height-rmin; x++) {
+    for (y = rmin; y < imgNormal->width-rmin; y++) { 
       int dist = (int) sqrt(pow(x-c.x, 2) + pow(y-c.y,2));
-      int dist1 = (int) sqrt(pow(x-c1.x, 2) + pow(y-c1.y,2));
+
+      //Com a formula da distância verifica-se a distância do pixel 
+      //atual é igual ao raio, ou seja está no limite do circulo. 
       if(dist == c.r) {
-        img2->pixels[x][y].r = 0;
-        img2->pixels[x][y].g = 255;
-        img2->pixels[x][y].b = 0;
-      }
-      if(dist1 == c1.r) {
-        img2->pixels[x][y].r = 255;
-        img2->pixels[x][y].g = 0;
-        img2->pixels[x][y].b = 0;
+        imgNormal->pixels[x][y].r = 0;
+        imgNormal->pixels[x][y].g = 255;
+        imgNormal->pixels[x][y].b = 0;
       }
     }
   }
-  printf("Meu deus berg\n");
 }
