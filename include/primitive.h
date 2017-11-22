@@ -9,3 +9,7 @@ typedef struct image{
   int height, width, maxPixel;
   Pixel **pixels;
 } Image;
+
+typedef struct circulo { 
+	int x, y, r, valor;
+} Circulo;

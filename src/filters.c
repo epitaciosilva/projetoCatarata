@@ -89,7 +89,7 @@ void sobelFilter(Image *img, Image *image) {
 
 void binaryFilter(Image *img) {
   int i, j;
-  int threshold = 18;
+  int threshold = 30;
   for (i = 0; i < img->height; i++) {
     for (j = 0; j < img->width; j++) {
       if(img->pixels[i][j].r > threshold) {

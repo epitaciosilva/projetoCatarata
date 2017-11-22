@@ -10,4 +10,5 @@ void verifyFileImage(Image *img);
 
 Pixel * pixelReturn(Image *img, int line, int column);
 
-void houghTransform(Image *img);
+void houghTransform(Image *image1, Image *image);
+  

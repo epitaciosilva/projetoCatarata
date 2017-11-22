@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "../include/primitive.h"
 #include "../include/imageTreatment.h"
 
@@ -104,19 +105,134 @@ Pixel * pixelReturn(Image *img, int line, int column) {
   return &img->pixels[line][column];
 }
 
-int ***matrixGenerate() {
-  int i, j; //[200][300][100]
-  int ***matrix = calloc(200, sizeof(int**));
 
-  for(i = 0; i < 200; i++) {
-      matrix[i] = calloc(300, sizeof(int*));
-    for(j = 0; j < 300; j++) {
-      matrix[i][j] = calloc(100, sizeof(int));
+// void houghTransform(Image * image1, Image * image2) {
+//   int x, y, a, b, r;
+//   int rmin = 190, rmax = 210, theta;
+//   double pi = 3.14159265;
+
+//   int ***matrix = calloc(rmin, sizeof(int**));
+
+//   for(x = 0; x < image1->height; x++) {
+//       matrix[x] = calloc(image1->width, sizeof(int*));
+//     for(y = 0; y < image1->width; y++) {
+//       matrix[x][y] = calloc(rmax-rmin+1, sizeof(int));
+//     }
+//   }
+//   printf("Matriz foi criada\n");
+//   for (x = 0; x < image1->height; x++) {
+//     for (y = 0; y < image1->width; y++) { 
+//       if(image1->pixels[x][y].r == 255) {
+//         for (r = rmin; r < rmax; r++) { 
+//           for (theta = 0; theta <= 360; theta++) { 
+//             a = (int) x - r*cos(theta*pi/180);
+//             b = (int) y - r*sin(theta*pi/180);          
+//             if(a > 0 && b > 0 && a-r >= 0 && b-r >= 0 && a+r < image1->height && b+r < image1->width) {
+//               matrix[a][b][r-rmin] +=1;
+//             } 
+//           }
+//         }
+//       }
+//     }
+//   }
+//   printf("Matriz foi preenchida\n");
+//   Circulo c = {0,0,0, matrix[0][0][0]};
+
+//   for (x = rmin; x < image1->height-rmin; x++) {
+//     for (y = rmin; y < image1->width-rmin; y++) { 
+//       for (r = rmin; r < rmax; r++) { 
+//         if(matrix[x][y][r-rmin] > c.value) {
+//           c.value = matrix[a][b][r-rmin];
+//           c.x = x;
+//           c.y = y;
+//           c.r = r;
+//           printf("%d %d %d %d\n", c.value, c.x, c.y, c.r);
+//         }
+//       }
+//     }
+//   }
+//   printf("Matriz foi encotrado o valor maior %d %d %d\n", c.r, c.x, c.y);
+//   for (x = rmin; x < image1->height-rmin; x++) {
+//     for (y = rmax; y < image1->width-rmin; y++) { 
+//       int dist = (int) sqrt(pow(x-c.x, 2) + pow(y-c.y,2));
+
+//       if(dist != c.r) {
+//         image2->pixels[x][y].r = 255;
+//         image2->pixels[x][y].g = 255;
+//         image2->pixels[x][y].b = 255;
+//       }
+//     }
+//   }
+//   printf("Meu deus berg\n");
+// }
+
+void houghTransform(Image *img, Image *img2) {
+    int x, y, a, b;
+    int r, rmin = 190, rmax = 210;
+    int t;
+    double PI = 3.14159265;
+    int ***acumulador = calloc(img->height, sizeof(int **));
+    for (x = 0; x < img->height; x++) {
+        acumulador[x] = calloc(img->width, sizeof(int *));
+        for (y = 0; y < img->width; y++) {
+            acumulador[x][y] = calloc(rmax - rmin + 1, sizeof(int));
+        }
+    }
+    for (x = rmin; x < img->height -rmin; x++) {
+        for (y = rmin; y < img->width - rmin; y++) {
+            if (img->pixels[x][y].r == 255) {
+                for (r = rmin; r < rmax; r++) {
+                    for (t = 0; t < 360; t++) {
+                        a = x - r * cos(t * PI / 180);
+                        b = y - r * sin(t * PI / 180);
+                        if (a >= 0 && b >= 0 && a < img->height && b < img->width && a - r >= 0 && b - r >= 0 &&
+                            a + r < img->height && b + r < img->width) {
+                            acumulador[a][b][r - rmin]++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Circulo c = {0, 0, 0, acumulador[0][0][0]};
+    Circulo c1 = {0, 0, 0, acumulador[0][0][0]};
+    int soma = 0;
+    for (x = rmin; x < img->height - rmin; x++) {
+        for (y = rmin; y < img->width - rmin; y++) {
+            for (r = rmin; r < rmax; r++) {
+                if (acumulador[x][y][r - rmin] > c.valor) {
+                    if(soma == 5) {
+                      c1.valor = c.valor;
+                      c1.x = c.x;
+                      c1.y = c.y;
+                      c1.r = c.r;
+                      soma = -1;
+                    }
+                    c.valor = acumulador[x][y][r - rmin];
+                    c.x = x;
+                    c.y = y;
+                    c.r = r;
+                    soma++;
+                }
+            }
+        }
+    }
+
+  for (x = rmin; x < img2->height-rmin; x++) {
+    for (y = rmin; y < img2->width-rmin; y++) { 
+      int dist = (int) sqrt(pow(x-c.x, 2) + pow(y-c.y,2));
+      int dist1 = (int) sqrt(pow(x-c1.x, 2) + pow(y-c1.y,2));
+      if(dist == c.r) {
+        img2->pixels[x][y].r = 0;
+        img2->pixels[x][y].g = 255;
+        img2->pixels[x][y].b = 0;
+      }
+      if(dist1 == c1.r) {
+        img2->pixels[x][y].r = 255;
+        img2->pixels[x][y].g = 0;
+        img2->pixels[x][y].b = 0;
+      }
     }
   }
-  return matrix;
-}
-
-void houghTransform(Image *img) {
-  int ***matrix = matrixGenerate();
+  printf("Meu deus berg\n");
 }

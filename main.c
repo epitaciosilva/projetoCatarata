@@ -14,7 +14,7 @@ void concatenateFileName(char nameFile[15], char *nameFinalFileImage, char nameF
 }
 
 int main() {
-  Image img, image;
+  Image img, image, imgFinal;
   char nameFileImage[20];
   char nameFinalFileImage[50];
 
@@ -25,6 +25,8 @@ int main() {
   //Recebe como parâmetro a variável Image e o nome do arquivo da imagem a ser diagnósticada.
   buildImage(&img, nameFileImage);
   buildImage(&image, nameFileImage);
+  buildImage(&imgFinal, nameFileImage);
+
 
   //Filtro cinza.
   grayFilter(&img);
@@ -44,9 +46,11 @@ int main() {
   concatenateFileName("BinaryImage", nameFinalFileImage, nameFileImage);
   saveImage(&image, nameFinalFileImage);
 
+  houghTransform(&image, &imgFinal);
+  concatenateFileName("FINAL", nameFinalFileImage, nameFileImage);
+  saveImage(&imgFinal, nameFinalFileImage);
+
   fclose(img.file);
   fclose(image.file);
-
-  houghTransform(&img);
   return 0;
 }
