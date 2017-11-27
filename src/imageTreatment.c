@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "../include/primitive.h"
 #include "../include/imageTreatment.h"
 
@@ -103,86 +102,4 @@ Pixel * pixelReturn(Image *img, int line, int column) {
   }
 
   return &img->pixels[line][column];
-}
-
-void houghTransform(Image *imgBinary, Image *imgNormal) {
-    int x, y, a, b;
-    int r, rmin, rmax;
-    
-    //Essas condicionais é para identificar qual a imagem.
-    if(imgBinary->width == 1015 && imgBinary->height == 759) {
-      rmin = 80;
-      rmax = 90;
-    } else if(imgBinary->width == 1198  && imgBinary->height == 770) {
-      rmin = 140;
-      rmax = 150;
-    } else if(imgBinary->width == 1167  && imgBinary->height == 739) {
-      rmin = 155;
-      rmax = 160;
-    } else {
-      rmin = 90;
-      rmax = 100;
-    }
-
-    int t;
-    double PI = 3.14159265;
-    int ***matrix = calloc(imgBinary->height, sizeof(int **));
-    
-    //Criação da matriz com calloc, pra já alocar com zero.
-    for (x = 0; x < imgBinary->height; x++) {
-        matrix[x] = calloc(imgBinary->width, sizeof(int *));
-        for (y = 0; y < imgBinary->width; y++) {
-            matrix[x][y] = calloc(rmax - rmin + 1, sizeof(int));
-        }
-    }
-
-    //Preenchimento da matris. 
-    //Colquei para começar com o rmin, pois os pixels menores que rmin certamente não formaram um circulo.
-    for (x = rmin; x < imgBinary->height - rmin; x++) {
-        for (y = rmin; y < imgBinary->width - rmin; y++) {
-            if (imgBinary->pixels[x][y].r == 255) {
-                for (r = rmin; r < rmax; r++) {
-                    for (t = 0; t < 360; t++) {
-                        a = x - r * cos(t * PI / 180);
-                        b = y - r * sin(t * PI / 180);
-                        //Condições para evitar a falha de segmentação.
-                        if (a >= 0 && b >= 0 && a < imgBinary->height && b < imgBinary->width && a - r >= 0 && b - r >= 0 &&
-                            a + r < imgBinary->height && b + r < imgBinary->width) {
-                            matrix[a][b][r - rmin]++;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    //'Circulo' é um struct para faciliar o processo de captação do raio, e das posĩções em x e y.
-    Circle circle = {0, 0, 0, matrix[0][0][0]};
-    for (x = rmin; x < imgBinary->height - rmin; x++) {
-        for (y = rmin; y < imgBinary->width - rmin; y++) {
-            for (r = rmin; r < rmax; r++) {
-                if (matrix[x][y][r - rmin] > circle.valor) {
-                    circle.valor = matrix[x][y][r - rmin];
-                    circle.x = x;
-                    circle.y = y;
-                    circle.r = r;
-                }
-            }
-        }
-    }
-
-  //Responsável por cálcular o circulo
-  for (x = rmin; x < imgNormal->height-rmin; x++) {
-    for (y = rmin; y < imgNormal->width-rmin; y++) { 
-      int dist = (int) sqrt(pow(x-circle.x, 2) + pow(y-circle.y,2));
-
-      //Com a formula da distância verifica-se a distância do pixel 
-      //atual é igual ao raio, ou seja, está no limite da circunferência. 
-      if(dist == circle.r) {
-        imgNormal->pixels[x][y].r = 255;
-        imgNormal->pixels[x][y].g = 255;
-        imgNormal->pixels[x][y].b = 255;
-      }
-    }
-  }
 }

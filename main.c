@@ -4,6 +4,7 @@
 #include "./include/imageTreatment.h"
 #include "./include/saveImages.h"
 #include "./include/filters.h"
+#include "./include/finalProcess.h"
 
 //Gerando nome do arquivo final das imagens.
 void concatenateFileName(char nameFile[15], char *nameFinalFileImage, char nameFileImage[20]) {
@@ -22,8 +23,8 @@ int main() {
   char nameFileImage[20];
   char nameFinalFileImage[50];
 
-  printf("Nome das imagens: Catarata.ppm, Catarata2.ppm, Normal.ppm e Normal2.ppm\n");
-  printf("Insira o nome de alguma dessas imagens:\n");
+  printf("\nNome das imagens:\nCatarata.ppm\nCatarata2.ppm\nNormal.ppm\nNormal2.ppm\n");
+  printf("\nInsira o nome de alguma dessas imagens:\n");
   fgets(nameFileImage, 20, stdin);
 
   //Contruindo imagens.
@@ -57,6 +58,9 @@ int main() {
   houghTransform(&image, &imgFinal);
   concatenateFileName("Final", nameFinalFileImage, nameFileImage);
   saveImage(&imgFinal, nameFinalFileImage);
+
+  printf("\nAcesse o arquivo Diagnostico.txt para saber do resultado.\n");
+  printf("Acesse a pasta images para visualizar todas as imgens geradas.\n");
 
   fclose(img.file);
   fclose(image.file);
