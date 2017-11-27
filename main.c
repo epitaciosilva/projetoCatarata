@@ -18,7 +18,8 @@ int main() {
   char nameFileImage[20];
   char nameFinalFileImage[50];
 
-  printf("Insira o nome do arquivo:\n");
+  printf("Nome das imagens: Catarata.ppm, Catarata2.ppm, Normal.ppm e Normal2.ppm\n");
+  printf("Insira o nome de alguma dessas imagens:\n");
   fgets(nameFileImage, 20, stdin);
 
   //Contruindo imagem.
