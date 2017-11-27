@@ -5,7 +5,7 @@
 #include "../include/primitive.h"
 #include "../include/finalProcess.h"
 
-void houghTransform(Image *imgBinary, Image *imgNormal) {
+void houghTransform(Image *imgBinary, Image *imgNormal, char *diagnosis) {
     int x, y, a, b;
     int r, rmin, rmax;
     
@@ -104,24 +104,27 @@ void houghTransform(Image *imgBinary, Image *imgNormal) {
   }
 
   //Clasificação da catarata. 
-  classification(allPupilPixel, pupilPixelCatarata);
+  classification(allPupilPixel, pupilPixelCatarata, diagnosis);
 }
 
-void classification(int allPupilPixel, int pupilPixelCatarata) {
-  FILE *finalResult = fopen("Diagnostico.txt", "w+");
-  
+void classification(int allPupilPixel, int pupilPixelCatarata, char *diagnosis) {
+  FILE *finalResult = fopen(diagnosis, "w+");
+  if(finalResult == NULL) {
+    printf("Não foi possível criar o arquivo de destino.\n Verifique os valores de entrada.\n");
+    exit(1);
+  }
   //Porcentagem de comprometimento da pupila. 
   //Quantidade de pixels com catarata por quantidade total de pixels.
   int percentage = (pupilPixelCatarata*100)/allPupilPixel;
 
   fprintf(finalResult, "Comprometimento da pupila: %d%c\n", percentage, '%');
 
-  if(percentage < 35) {
-    fprintf(finalResult, "Diagnóstico final: Sem Catarata. Porém, consulte um médico.\n");
+  if(percentage < 20) {
+    fprintf(finalResult, "Diagnóstico final: Sem Catarata. Porém, por prevenção consulte um médico.\n");
   } else if(percentage > 60) {
     fprintf(finalResult, "Diagnóstico final: Com Catarata.\nProcure um médico urgente.\n");
   } else {
-    fprintf(finalResult, "Diagnóstico final: comprometimento está alto.\n Procure um médico urgente.\n");
+    fprintf(finalResult, "Diagnóstico final: Não tem certeza.\n Comprometimento está alto, procure um médico urgente.\n");
   }
 }
 

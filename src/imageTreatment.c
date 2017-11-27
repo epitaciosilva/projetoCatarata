@@ -5,13 +5,8 @@
 #include "../include/imageTreatment.h"
 
 //Apenas chamo as funções para construção da imagem.
-void buildImage(Image *img, char *nameFileImage) {
-  if(nameFileImage != '\0') {
-    char dest[50] = "images/";
-    strncat(dest, nameFileImage, strlen(nameFileImage)-1);
-    img->file = fopen(dest, "rw");
-  }
-
+void buildImage(Image *img, char *source) {
+  img->file = fopen(source, "rw");  
   //Primeiro verifico o arquivo, se foi possível ler ou não e o tipo da imagem.
   verifyFileImage(img);
   //Deleta o comentário presente na imagem.

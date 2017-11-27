@@ -1,66 +1,47 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "./include/primitive.h"
 #include "./include/imageTreatment.h"
 #include "./include/saveImages.h"
 #include "./include/filters.h"
 #include "./include/finalProcess.h"
 
-//Gerando nome do arquivo final das imagens.
-void concatenateFileName(char nameFile[15], char *nameFinalFileImage, char nameFileImage[20]) {
-  //Apenas para inicializar a variável.
-  strcpy(nameFinalFileImage, "");
-  //Concatena com o nome inicial da image.
-  strncat(nameFinalFileImage, nameFileImage, strlen(nameFileImage)-5);
-  //Concatena com nome passado por parâmetro.
-  strncat(nameFinalFileImage, nameFile, strlen(nameFile));
-  //Coloca a extensão do arquivo '.ppm'.
-  strncat(nameFinalFileImage, ".ppm", 4);
-}
-
-int main() {
+int main(int argc, char *argv[]) {
   Image img, image, imgFinal;
-  char nameFileImage[20];
-  char nameFinalFileImage[50];
-
-  printf("\nNome das imagens:\nCatarata.ppm\nCatarata2.ppm\nNormal.ppm\nNormal2.ppm\n");
-  printf("\nInsira o nome de alguma dessas imagens:\n");
-  fgets(nameFileImage, 20, stdin);
-
+  
+  if(argc != 7) {
+    printf("Erro nos valores de entrada. Verifique os parâmetros de entrada.\n");
+    exit(1);
+  }
   //Contruindo imagens.
   //Recebe como parâmetro a variável Image e o nome do arquivo da imagem a ser diagnósticada.
-  buildImage(&img, nameFileImage);
-  buildImage(&image, nameFileImage);
-  buildImage(&imgFinal, nameFileImage);
-
+  buildImage(&img, argv[2]);
+  buildImage(&image, argv[2]);
+  buildImage(&imgFinal, argv[2]);
 
   //Filtro cinza.
   grayFilter(&img);
-  concatenateFileName("GrayImage", nameFinalFileImage, nameFileImage);
-  saveImage(&img, nameFinalFileImage);
+  saveImage(&img, "GrayImage.ppm");
 
   //Filtro gaussiano
   gaussianoFilter(&img);
-  concatenateFileName("GaussianoImage", nameFinalFileImage, nameFileImage);
-  saveImage(&img, nameFinalFileImage);
+  saveImage(&img, "GaussianoImage.ppm");
 
   //Filtro de sobel
   sobelFilter(&img, &image);
-  concatenateFileName("SobelImage", nameFinalFileImage, nameFileImage);
-  saveImage(&image, nameFinalFileImage);
+  saveImage(&image, "SobelImage.ppm");
 
   //Binarização
   binaryFilter(&image);
-  concatenateFileName("BinaryImage", nameFinalFileImage, nameFileImage);
-  saveImage(&image, nameFinalFileImage);
+  saveImage(&image, "BinaryImage.ppm");
 
   //Transformação de Hough
-  houghTransform(&image, &imgFinal);
-  concatenateFileName("Final", nameFinalFileImage, nameFileImage);
-  saveImage(&imgFinal, nameFinalFileImage);
+  houghTransform(&image, &imgFinal, argv[6]);
+  saveImage(&imgFinal, "Final.ppm");
 
-  printf("\nAcesse o arquivo Diagnostico.txt para saber do resultado.\n");
-  printf("Acesse a pasta images para visualizar todas as imgens geradas.\n");
+  printf("Acesse o arquivo %s para saber do resultado.\n", argv[6]);
+  printf("Acesse a pasta images para visualizar as imagens geradas.\n");
 
   fclose(img.file);
   fclose(image.file);

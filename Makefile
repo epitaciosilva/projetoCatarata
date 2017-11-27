@@ -1,7 +1,7 @@
-all: executable
+all: catarata
 
-executable: imageTreatment.o filters.o saveImages.o finalProcess.o
-	gcc main.c imageTreatment.o filters.o saveImages.o finalProcess.o -o executable -W -g -lm
+catarata: imageTreatment.o filters.o saveImages.o finalProcess.o
+	gcc main.c imageTreatment.o filters.o saveImages.o finalProcess.o -o catarata -W -g -lm
 
 imageTreatment.o: ./src/imageTreatment.c
 	gcc -c ./src/imageTreatment.c -W -g
@@ -16,4 +16,4 @@ finalProcess.o:
 	gcc -c ./src/finalProcess.c -W -g -lm
 
 clean: 
-	rm -f ./images/*Image.ppm ./images/*Final.ppm *.o *.txt
+	rm -f ./images/*Image.ppm ./images/*Final.ppm *.o *.txt catarata
