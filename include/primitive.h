@@ -10,6 +10,6 @@ typedef struct image{
   Pixel **pixels;
 } Image;
 
-typedef struct circulo { 
+typedef struct circle { 
 	int x, y, r, valor;
-} Circulo;
+} Circle;

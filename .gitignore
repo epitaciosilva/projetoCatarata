@@ -1,4 +1,8 @@
-exec
-help
+#Files generated with makefile
+executable
+*.o
+
+#Images generated with the system
 images/*Image.ppm
-images/*FINAL.ppm
+images/*Final.ppm
+

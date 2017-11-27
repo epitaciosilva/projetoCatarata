@@ -120,8 +120,8 @@ void houghTransform(Image *imgBinary, Image *imgNormal) {
       rmin = 155;
       rmax = 160;
     } else {
-      rmin = 50;
-      rmax = 60;
+      rmin = 90;
+      rmax = 100;
     }
 
     int t;
@@ -157,15 +157,15 @@ void houghTransform(Image *imgBinary, Image *imgNormal) {
     }
 
     //'Circulo' é um struct para faciliar o processo de captação do raio, e das posĩções em x e y.
-    Circulo c = {0, 0, 0, matrix[0][0][0]};
+    Circle circle = {0, 0, 0, matrix[0][0][0]};
     for (x = rmin; x < imgBinary->height - rmin; x++) {
         for (y = rmin; y < imgBinary->width - rmin; y++) {
             for (r = rmin; r < rmax; r++) {
-                if (matrix[x][y][r - rmin] > c.valor) {
-                    c.valor = matrix[x][y][r - rmin];
-                    c.x = x;
-                    c.y = y;
-                    c.r = r;
+                if (matrix[x][y][r - rmin] > circle.valor) {
+                    circle.valor = matrix[x][y][r - rmin];
+                    circle.x = x;
+                    circle.y = y;
+                    circle.r = r;
                 }
             }
         }
@@ -174,14 +174,14 @@ void houghTransform(Image *imgBinary, Image *imgNormal) {
   //Responsável por cálcular o circulo
   for (x = rmin; x < imgNormal->height-rmin; x++) {
     for (y = rmin; y < imgNormal->width-rmin; y++) { 
-      int dist = (int) sqrt(pow(x-c.x, 2) + pow(y-c.y,2));
+      int dist = (int) sqrt(pow(x-circle.x, 2) + pow(y-circle.y,2));
 
       //Com a formula da distância verifica-se a distância do pixel 
-      //atual é igual ao raio, ou seja está no limite do circulo. 
-      if(dist == c.r) {
-        imgNormal->pixels[x][y].r = 0;
+      //atual é igual ao raio, ou seja, está no limite da circunferência. 
+      if(dist == circle.r) {
+        imgNormal->pixels[x][y].r = 255;
         imgNormal->pixels[x][y].g = 255;
-        imgNormal->pixels[x][y].b = 0;
+        imgNormal->pixels[x][y].b = 255;
       }
     }
   }
