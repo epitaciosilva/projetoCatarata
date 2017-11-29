@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   saveImage(&imgColorful, "Final.ppm");
 
   printf("Acesse o arquivo %s para saber do resultado.\n", argv[6]);
-  printf("E para visualizar as imagens geradas acesse a pasta images.\n");
+  printf("Para visualizar as imagens geradas acesse a pasta images.\n");
 
   fclose(img.file);
   fclose(imgSobelBinary.file);

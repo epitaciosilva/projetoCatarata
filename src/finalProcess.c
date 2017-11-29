@@ -130,13 +130,14 @@ void classification(Image *imgColorful, Circle *circle, char *diagnosis) {
   //Quantidade de pixels com catarata por quantidade total de pixels.
   percentage = pupilPixelCatarata*100/allPupilPixel;
 
-  fprintf(finalResult, "Comprometimento da pupila: %d%c\n", percentage, '%');
   if(percentage < 20) {
-    fprintf(finalResult, "Diagnóstico final: Sem Catarata. Porém, por prevenção consulte um médico.\n");
+    fprintf(finalResult, "​Diagnóstico​ Geral: Sem Catarata.\n");
   } else if(percentage > 60) {
-    fprintf(finalResult, "Diagnóstico final: Com Catarata.\nProcure um médico urgente.\n");
+    fprintf(finalResult, "​Diagnóstico​ Geral: Com Catarata.\n");
   } else {
-    fprintf(finalResult, "Diagnóstico final: Não tem certeza.\n Comprometimento está alto, procure um médico urgente.\n");
+    fprintf(finalResult, "​Diagnóstico​ Geral: Sem Catarata. Mas o comprometimento está alto, procure um médico.\n");
   }
+
+  fprintf(finalResult, "Porcentagem​ de​ ​Comprometimento:​ %d%c.\n", percentage, '%');
 }
 
