@@ -20,7 +20,6 @@ Projeto busca detectar através de uma imagem se um olho possui ou não catarata
 
 ## Observações
 Todos os processos estão bem separados para uma melhor compreenção do código.
-
 Algumas partes poderiam ser unidas, diminuindo o tempo de execução, como por exemplo a transformação de Hough e a classificação. 
 
 
