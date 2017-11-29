@@ -1,3 +1,7 @@
+typedef enum bool {
+	false, true
+} Bool;
+
 //Cria o tipo Pixel. 
 typedef struct pixel {
   int r, g, b;

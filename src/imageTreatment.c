@@ -8,20 +8,25 @@
 void buildImage(Image *img, char *source) {
   img->file = fopen(source, "rw");  
   //Primeiro verifico o arquivo, se foi possível ler ou não e o tipo da imagem.
-  verifyFileImage(img);
-  //Deleta o comentário presente na imagem.
-  deleteComments(img->file);
+  
+  if(verifyFileImage(img) ==  false){
+    exit(1);
+  }
+
+  //Deleta o comentário presente nas imagens.
+  char comment = fgetc(img->file);
+  deleteComments(img->file, comment);
   //Aloca a largura e altura da imagme.
   allocateDimensions(img);
   //Constroi a matriz de pixels.
   buildPixelsMatrix(img);
 }
 
-void verifyFileImage(Image *img) {
+Bool verifyFileImage(Image *img) {
   //Verificando se foi possível ler o arquivo.
   if(img->file == NULL) {
     printf("Nao foi possivel abrir o arquivo.\n");
-    exit(1);
+    return false;
   }
 
   //Pegando a primeira linha do arquivo, no caso é o cabeçalho.
@@ -30,30 +35,22 @@ void verifyFileImage(Image *img) {
   //Verifica se é do tipo P3
   if(header[0] != 'P' || header[1] != '3') {
     printf("Formato da imagem deve ser P3.\n");
-    exit(1);
+    return false;
   }
+
+  return true;
 }
 
-
-void deleteComments(FILE *fileImage) {
-  //fgetc retira o primeiro char do arquivo.
-    char comment = fgetc(fileImage);
-
-    do {
-        //Caso a variável comment seja igual a ao '#' então toda a linha deve ser descartada.
-        if (comment == '#') {
-          //Isso é responsável por retirar todos os char daquela linha.
-            while (comment != '\n') {
-              comment = fgetc(fileImage);
-            }
-        } else {
-          //Caso não seja comentário, então deveolve o char ao arquivo.
-          ungetc(comment, fileImage);
-        }
-        //Verificando se a próxima linha também é um comentário.
-        comment = fgetc(fileImage);
-    } while (comment == '#');
-    ungetc(comment, fileImage);
+//Utilizando função recursiva obrigatória.
+void deleteComments(FILE *fileImage, char comment) {
+    //fgetc retira o primeiro char do arquivos
+    //ungetc develve caso o caratere não pertença ao comentário
+    if(comment != '\n') {
+      comment = fgetc(fileImage);
+      deleteComments(fileImage, comment);
+    } else if(comment != '#') {
+      ungetc(comment, fileImage); 
+    } 
 }
 
 void allocateDimensions(Image *img) {

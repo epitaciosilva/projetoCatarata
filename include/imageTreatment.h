@@ -1,12 +1,12 @@
 void buildImage(Image *img, char *nameFileImage);
 
-void buildPixelsMatrix(Image *img);
+Bool verifyFileImage(Image *img);
 
-void deleteComments(FILE *fileImage);
+void deleteComments(FILE *fileImage, char comment);
 
 void allocateDimensions(Image *img);
 
-void verifyFileImage(Image *img);
+void buildPixelsMatrix(Image *img);
 
 Pixel * pixelReturn(Image *img, int line, int column);
 
