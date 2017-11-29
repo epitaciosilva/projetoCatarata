@@ -1,4 +1,4 @@
-void houghTransform(Image *imgBinary, Image *imgNormal, char *diagnosis);
+Circle houghTransform(Image *imgSobelBinary, Image *imgColorful);
 
-void classification(int allPupilPixel, int pupilPixelCatarata, char *diagnosis);
+void classification(Image *imgColorful, Circle *circle, char *diagnosis);
 

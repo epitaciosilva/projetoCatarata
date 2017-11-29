@@ -5,91 +5,114 @@
 #include "../include/primitive.h"
 #include "../include/finalProcess.h"
 
-void houghTransform(Image *imgBinary, Image *imgNormal, char *diagnosis) {
-    int x, y, a, b;
-    int r, rmin, rmax;
-    
-    //Essas condicionais é para identificar qual a imagem.
-    if(imgBinary->width == 1015 && imgBinary->height == 759) {
-      rmin = 80;
-      rmax = 90;
-    } else if(imgBinary->width == 1198  && imgBinary->height == 770) {
-      rmin = 140;
-      rmax = 150;
-    } else if(imgBinary->width == 1167  && imgBinary->height == 739) {
-      rmin = 155;
-      rmax = 160;
-    } else {
-      rmin = 90;
-      rmax = 100;
-    }
+Circle houghTransform(Image *imgSobelBinary, Image *imgColorful) {
+  int x, y, a, b;
+  int r;
+  Circle circle;
 
-    int t;
-    double PI = 3.14159265;
-    int ***matrix = calloc(imgBinary->height, sizeof(int **));
-    
-    //Criação da matriz com calloc, pra já alocar com zero.
-    for (x = 0; x < imgBinary->height; x++) {
-        matrix[x] = calloc(imgBinary->width, sizeof(int *));
-        for (y = 0; y < imgBinary->width; y++) {
-            matrix[x][y] = calloc(rmax - rmin + 1, sizeof(int));
-        }
-    }
+  //Essas condicionais é para identificar qual a imagem.
+  if(imgSobelBinary->width == 1015 && imgSobelBinary->height == 759) {
+    circle.radiusMin = 80;
+    circle.radiusMax = 90;
+  } else if(imgSobelBinary->width == 1198  && imgSobelBinary->height == 770) {
+    circle.radiusMin = 140;
+    circle.radiusMax = 150;
+  } else if(imgSobelBinary->width == 1167  && imgSobelBinary->height == 739) {
+    circle.radiusMin = 155;
+    circle.radiusMax = 160;
+  } else {
+    circle.radiusMin = 90;
+    circle.radiusMax = 100;
+  }
 
-    //Preenchimento da matris. 
-    //Colquei para começar com o rmin, pois os pixels menores que rmin certamente não formaram um circulo.
-    for (x = rmin; x < imgBinary->height - rmin; x++) {
-        for (y = rmin; y < imgBinary->width - rmin; y++) {
-            if (imgBinary->pixels[x][y].r == 255) {
-                for (r = rmin; r < rmax; r++) {
-                    for (t = 0; t < 360; t++) {
-                        a = x - r * cos(t * PI / 180);
-                        b = y - r * sin(t * PI / 180);
-                        //Condições para evitar a falha de segmentação.
-                        if (a >= 0 && b >= 0 && a < imgBinary->height && b < imgBinary->width && a - r >= 0 && b - r >= 0 &&
-                            a + r < imgBinary->height && b + r < imgBinary->width) {
-                            matrix[a][b][r - rmin]++;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    //'Circulo' é um struct para faciliar o processo de captação do raio, e das posĩções em x e y.
-    Circle circle = {0, 0, 0, matrix[0][0][0]};
-    for (x = rmin; x < imgBinary->height - rmin; x++) {
-        for (y = rmin; y < imgBinary->width - rmin; y++) {
-            for (r = rmin; r < rmax; r++) {
-                if (matrix[x][y][r - rmin] > circle.valor) {
-                    circle.valor = matrix[x][y][r - rmin];
-                    circle.x = x;
-                    circle.y = y;
-                    circle.r = r;
-                }
-            }
-        }
-    }
-
+  int t;
+  double PI = 3.14159265;
+  int ***matrix = calloc(imgSobelBinary->height, sizeof(int **));
   
-  int dist, averagePerPixel = 0, allPupilPixel = 0, pupilPixelCatarata = 0, threshold = (60*150)/100;
+  //Criação da matriz com calloc, pra já alocar com zero.
+  for (x = 0; x < imgSobelBinary->height; x++) {
+      matrix[x] = calloc(imgSobelBinary->width, sizeof(int *));
+      for (y = 0; y < imgSobelBinary->width; y++) {
+          matrix[x][y] = calloc(circle.radiusMax - circle.radiusMin + 1, sizeof(int));
+      }
+  }
+
+  //Preenchimento da matris. 
+  //Colquei para começar com o circle.radiusMin, pois os pixels menores que circle.radiusMin certamente não formaram um circulo.
+  for (x = circle.radiusMin; x < imgSobelBinary->height - circle.radiusMin; x++) {
+      for (y = circle.radiusMin; y < imgSobelBinary->width - circle.radiusMin; y++) {
+          if (imgSobelBinary->pixels[x][y].r == 255) {
+              for (r = circle.radiusMin; r < circle.radiusMax; r++) {
+                  for (t = 0; t < 360; t++) {
+                      a = x - r * cos(t * PI / 180);
+                      b = y - r * sin(t * PI / 180);
+                      //Condições para evitar a falha de segmentação.
+                      if (a >= 0 && b >= 0 && a < imgSobelBinary->height && b < imgSobelBinary->width && a - r >= 0 && b - r >= 0 &&
+                          a + r < imgSobelBinary->height && b + r < imgSobelBinary->width) {
+                          matrix[a][b][r - circle.radiusMin]++;
+                      }
+                  }
+              }
+          }
+      }
+  }
+
+  //'Circulo' é um struct para faciliar o processo de captação do raio, e das posĩções em x e y.
+  circle.x = 0;
+  circle.y = 0;
+  circle.radius = 0;
+  circle.value = matrix[0][0][0];
+
+  for (x = circle.radiusMin; x < imgSobelBinary->height - circle.radiusMin; x++) {
+      for (y = circle.radiusMin; y < imgSobelBinary->width - circle.radiusMin; y++) {
+          for (r = circle.radiusMin; r < circle.radiusMax; r++) {
+              if (matrix[x][y][r - circle.radiusMin] > circle.value) {
+                  circle.value = matrix[x][y][r - circle.radiusMin];
+                  circle.x = x;
+                  circle.y = y;
+                  circle.radius = r;
+              }
+          }
+      }
+  }
+
+  int dist; /*, averagePerPixel = 0, */
   
   //Responsável por delimitar o círculo.
-  for (x = rmin; x < imgNormal->height-rmin; x++) {
-    for (y = rmin; y < imgNormal->width-rmin; y++) { 
+  for (x = circle.radiusMin; x < imgColorful->height-circle.radiusMin; x++) {
+    for (y = circle.radiusMin; y < imgColorful->width-circle.radiusMin; y++) { 
       dist = (int) sqrt(pow(x-circle.x, 2) + pow(y-circle.y,2));
 
       //Com a formula da distância verifica-se a distância do pixel 
       //atual é igual ao raio, ou seja, está no limite da circunferência. 
-      if(dist == circle.r) {
-        
-        imgNormal->pixels[x][y].r = 255;
-        imgNormal->pixels[x][y].g = 255;
-        imgNormal->pixels[x][y].b = 0;
+      if(dist == circle.radius) {
+        imgColorful->pixels[x][y].r = 255;
+        imgColorful->pixels[x][y].g = 255;
+        imgColorful->pixels[x][y].b = 0;
+      }
+    }
+  }
 
-      } else if(dist < circle.r) {
+  return circle;
+}
+
+void classification(Image *imgColorful, Circle *circle, char *diagnosis) {
+  FILE *finalResult = fopen(diagnosis, "w+");
+  
+  if(finalResult == NULL) {
+    printf("Não foi possível criar o arquivo de para o diagnostico.\n Verifique os valores de entrada.\n");
+    exit(1);
+  }
+
+  int dist, averagePerPixel, allPupilPixel, pupilPixelCatarata, percentage, threshold = (60*150)/100;
+  int x, y;
+
+  for (x = circle->radiusMin; x < imgColorful->height-circle->radiusMin; x++) {
+    for (y = circle->radiusMin; y < imgColorful->width-circle->radiusMin; y++) { 
+      dist = (int) sqrt(pow(x-circle->x, 2) + pow(y-circle->y,2));
+      if(dist < circle->radius) {
         //Valor do pixel.
-        averagePerPixel = (imgNormal->pixels[x][y].r + imgNormal->pixels[x][y].g + imgNormal->pixels[x][y].b)/3;
+        averagePerPixel = (imgColorful->pixels[x][y].r + imgColorful->pixels[x][y].g + imgColorful->pixels[x][y].b)/3;
         
         //Contabilizando quantidade de pixels dentro da pupila.  
         allPupilPixel++;
@@ -103,22 +126,11 @@ void houghTransform(Image *imgBinary, Image *imgNormal, char *diagnosis) {
     }
   }
 
-  //Clasificação da catarata. 
-  classification(allPupilPixel, pupilPixelCatarata, diagnosis);
-}
-
-void classification(int allPupilPixel, int pupilPixelCatarata, char *diagnosis) {
-  FILE *finalResult = fopen(diagnosis, "w+");
-  if(finalResult == NULL) {
-    printf("Não foi possível criar o arquivo de destino.\n Verifique os valores de entrada.\n");
-    exit(1);
-  }
   //Porcentagem de comprometimento da pupila. 
   //Quantidade de pixels com catarata por quantidade total de pixels.
-  int percentage = (pupilPixelCatarata*100)/allPupilPixel;
+  percentage = pupilPixelCatarata*100/allPupilPixel;
 
   fprintf(finalResult, "Comprometimento da pupila: %d%c\n", percentage, '%');
-
   if(percentage < 20) {
     fprintf(finalResult, "Diagnóstico final: Sem Catarata. Porém, por prevenção consulte um médico.\n");
   } else if(percentage > 60) {

@@ -8,17 +8,20 @@
 #include "./include/finalProcess.h"
 
 int main(int argc, char *argv[]) {
-  Image img, image, imgFinal;
+  Image img, imgSobelBinary, imgColorful;
   
   if(argc != 7) {
-    printf("Erro nos valores de entrada. Verifique os parâmetros de entrada.\n");
+    printf("Erro nos valores de entrada. Verifique os parâmetros.\n");
     exit(1);
   }
+
   //Contruindo imagens.
   //Recebe como parâmetro a variável Image e o nome do arquivo da imagem a ser diagnósticada.
+  //A imgSobelBinary e a imgColorful é necessária para implementação do filtro de sobel e 
+  //para dectectação da iris e da catarata respectivamente.
   buildImage(&img, argv[2]);
-  buildImage(&image, argv[2]);
-  buildImage(&imgFinal, argv[2]);
+  buildImage(&imgSobelBinary, argv[2]);
+  buildImage(&imgColorful, argv[2]);
 
   //Filtro cinza.
   grayFilter(&img);
@@ -28,23 +31,24 @@ int main(int argc, char *argv[]) {
   gaussianoFilter(&img);
   saveImage(&img, "GaussianoImage.ppm");
 
-  //Filtro de sobel
-  sobelFilter(&img, &image);
-  saveImage(&image, "SobelImage.ppm");
+  //Filtro de sobelimgSobelBinary
+  sobelFilter(&img, &imgSobelBinary);
+  saveImage(&imgSobelBinary, "SobelImage.ppm");
 
   //Binarização
-  binaryFilter(&image);
-  saveImage(&image, "BinaryImage.ppm");
+  binaryFilter(&imgSobelBinary);
+  saveImage(&imgSobelBinary, "BinaryImage.ppm");
 
   //Transformação de Hough
-  houghTransform(&image, &imgFinal, argv[6]);
-  saveImage(&imgFinal, "Final.ppm");
+  Circle circle = houghTransform(&imgSobelBinary, &imgColorful);
+  classification(&imgColorful, &circle, argv[6]);
+  saveImage(&imgColorful, "Final.ppm");
 
   printf("Acesse o arquivo %s para saber do resultado.\n", argv[6]);
-  printf("Acesse a pasta images para visualizar as imagens geradas.\n");
+  printf("E para visualizar as imagens geradas acesse a pasta images.\n");
 
   fclose(img.file);
-  fclose(image.file);
-  fclose(imgFinal.file);
+  fclose(imgSobelBinary.file);
+  fclose(imgColorful.file);
   return 0;
 }

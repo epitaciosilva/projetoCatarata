@@ -11,5 +11,6 @@ typedef struct image{
 } Image;
 
 typedef struct circle { 
-	int x, y, r, valor;
+	int x, y, radius, value;
+	int radiusMin, radiusMax;
 } Circle;
