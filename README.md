@@ -12,11 +12,12 @@ Projeto busca detectar através de uma imagem se um olho possui ou não catarata
 ## Funcionalidades básicas
 * Transformação da imagem colorida para tons de cinza.
 * Aplicação do filtro gaussiano e do sobel e a binarização.
-* Transformação de Hough
-* Classificação
+* Transformação de Hough.
+* Segmentacao da pupila.
+* Diagnóstico da catarata.
 
 ## Funcionalidades extras
-* Classificação é feita utilizando imagem colorida. 
+* Segmentação e diagnóstico são feitos utilizando imagens colorida. 
 
 ## Observações
 Todos os processos estão bem separados para uma melhor compreenção do código.
